@@ -1,5 +1,16 @@
 CREATE DATABASE olist_project;
 
+-- customers → orders → order_items ← products
+--                     ↓
+--                  payments
+--                     ↓
+--                  sellers
+
+
+-- 8 Tables
+-- 100K+ Orders
+-- Relational Database Design
+
 USE olist_project;
 
 CREATE TABLE customers (
@@ -472,8 +483,6 @@ select     customer_id,
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- 																		    Cohort Analysis
 -- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
 -- Find First Purchase Month
 
 with first_order as (select customer_id, 
@@ -481,9 +490,7 @@ with first_order as (select customer_id,
        from orders
        group by customer_id)
        
-       select * from first_order;
-       
-       
+       select * from first_order;       
        
 -- Create Cohort Month       
        
