@@ -1,0 +1,101 @@
+# End-to-End Data Analysis Project (Olist E-Commerce)
+
+An end-to-end customer analytics project built on the Olist e-commerce dataset, using MySQL for storage and Python (Pandas + SQLAlchemy) for extraction, data quality checks, customer segmentation, and RFM (Recency, Frequency, Monetary) analysis.
+
+## Project Overview
+
+This project answers a simple business question: **who are our most valuable customers, and how should we treat different customer groups differently?**
+
+It does this in four stages:
+
+1. **Data Quality Audit** — profile the raw MySQL tables (`customers`, `orders`, `products`) for shape, nulls, duplicates, and data types before trusting any downstream analysis.
+2. **Master Dataset Build** — join customers, orders, and order items into a single transaction-level dataset and tag each customer with a value segment.
+3. **Customer Segmentation** — aggregate total spend per customer and bucket customers into High / Medium / Low value tiers.
+4. **RFM Analysis** — score every customer on Recency, Frequency, and Monetary value, then classify them into actionable segments (Champions, Loyal Customers, Potential Loyalists, Need Attention, At Risk).
+
+## Repository Structure
+
+```
+.
+├── src/
+│   ├── mysql_connection.py        # Initial DB connection + exploratory revenue/AOV/top-customer queries
+│   ├── data_quality_report.py     # Profiles customers/orders/products tables and exports a QA summary
+│   ├── master_dataset.py          # Builds the joined transaction-level dataset with value segments
+│   ├── customer_segmentation.py   # Total-spend based High/Medium/Low value segmentation
+│   └── rfm_analysis.py            # Full RFM scoring and customer segmentation
+├── data/
+│   ├── master_sales_dataset.csv   # Transaction-level data with segment tags
+│   ├── customer_segments.csv      # Customer-level spend + value segment
+│   └── rfm_analysis2.csv          # Customer-level RFM scores and segments
+├── outputs/
+│   └── data_quality_report.xlsx   # Exported data quality summary (rows, nulls, duplicates per table)
+└── README.md
+```
+
+## Tech Stack
+
+- **Database:** MySQL
+- **Language:** Python 3
+- **Libraries:** pandas, SQLAlchemy, PyMySQL, openpyxl
+
+## How It Works
+
+### 1. Data Quality Report (`data_quality_report.py`)
+Connects to the `olist_project` MySQL database and runs a reusable `data_quality_report()` function across the `customers`, `orders`, and `products` tables, checking shape, nulls, duplicates, and dtypes. Results are exported to `outputs/data_quality_report.xlsx`.
+
+### 2. Master Dataset (`master_dataset.py`)
+Joins `customers` → `orders` → `order_items` to produce one row per order item, calculates total spend per customer, tags each customer as **High / Medium / Low Value**, and merges the segment back onto the transaction-level data. Exported as `data/master_sales_dataset.csv`.
+
+### 3. Customer Segmentation (`customer_segmentation.py`)
+Aggregates total spend per customer directly in SQL, then applies the same spend-based segmentation logic (High ≥ 154, Medium ≥ 90, Low otherwise) and exports `data/customer_segments.csv`.
+
+### 4. RFM Analysis (`rfm_analysis.py`)
+For each customer, calculates:
+- **Recency** — days since last purchase (relative to the most recent order in the dataset)
+- **Frequency** — number of unique orders
+- **Monetary** — total amount spent
+
+Each metric is scored 1–5 using quintiles (`pd.qcut`), combined into an `RFM_Score` and `RFM_Total`, and mapped to a segment:
+
+| RFM Total | Segment |
+|---|---|
+| ≥ 13 | Champions |
+| 10–12 | Loyal Customers |
+| 7–9 | Potential Loyalists |
+| 4–6 | Need Attention |
+| < 4 | At Risk |
+
+Exported as `data/rfm_analysis2.csv`.
+
+## Setup
+
+```bash
+pip install pandas sqlalchemy pymysql openpyxl
+```
+
+Update the database connection string in each script to match your local MySQL setup:
+
+```python
+engine = create_engine("mysql+pymysql://<user>:<password>@<host>/olist_project")
+```
+
+> **Note:** The scripts currently use a local root connection with no password for development convenience. For any shared or production use, move credentials to environment variables instead of hardcoding them.
+
+## Running the Pipeline
+
+```bash
+python src/data_quality_report.py
+python src/master_dataset.py
+python src/customer_segmentation.py
+python src/rfm_analysis.py
+```
+
+## Key Findings
+
+- Customers are split into actionable value tiers based on total historical spend.
+- RFM segmentation surfaces distinct groups — **Champions** and **Loyal Customers** for retention/upsell focus, and **At Risk** customers for win-back campaigns.
+- Combining a simple spend-based segmentation with a full RFM model gives both a quick-glance view and a more nuanced, behavior-based view of customer value.
+
+## Author
+
+Jayant Kumar
