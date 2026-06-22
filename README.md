@@ -157,9 +157,7 @@ The final dataset is used to build an interactive Power BI dashboard featuring:
 
 ### Dashboard Preview
 
-> Add your dashboard screenshots here
-
-![Dashboard Screenshot]([dashboard.png]([url](https://drive.google.com/drive/u/0/folders/1Gy2ZpEq-34i49fT6a5ryeNMmwboX9NVh)))
+Dashboard Screenshot([dashboard.png]([url](https://drive.google.com/drive/u/0/folders/1Gy2ZpEq-34i49fT6a5ryeNMmwboX9NVh)))
 
 ---
 
