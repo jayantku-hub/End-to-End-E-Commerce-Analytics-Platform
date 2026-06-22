@@ -191,7 +191,7 @@ PBIX File:
 
 **Jayant Kumar**
 
-Associate Research Analyst | Data Analyst
+Research Analyst | Data Analyst
 
 ### Skills
 
